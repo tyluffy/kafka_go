@@ -76,9 +76,6 @@ func (s *Server) React(frame []byte, c gnet.Conn) ([]byte, gnet.Action) {
 	connMutex.Unlock()
 	ctx = c.Context()
 	networkContext := ctx.(*context.NetworkContext)
-	if !s.kafkaImpl.Available(networkContext.Addr) {
-		return nil, gnet.Close
-	}
 	apiKey := api.Code(binary.BigEndian.Uint16(frame))
 	apiVersion := int16(binary.BigEndian.Uint16(frame[2:]))
 	if apiKey == api.ApiVersions {

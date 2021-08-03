@@ -106,7 +106,3 @@ func (e ExampleKafkaImpl) SaslAuth(username string, password string) (bool, serv
 func (e ExampleKafkaImpl) Disconnect(addr *net.Addr) {
 	fmt.Println("do nothing now.")
 }
-
-func (e ExampleKafkaImpl) Available(addr *net.Addr) bool {
-	return true
-}

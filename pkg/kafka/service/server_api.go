@@ -22,6 +22,4 @@ type KfkServer interface {
 	SaslAuth(username string, password string) (bool, ErrorCode)
 
 	Disconnect(addr *net.Addr)
-
-	Available(addr *net.Addr) bool
 }
