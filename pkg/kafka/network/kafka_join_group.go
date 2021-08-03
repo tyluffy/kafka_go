@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -23,15 +23,15 @@ func (s *Server) ReactJoinGroupVersion(ctx *context.NetworkContext, frame []byte
 		return nil, gnet.Close
 	}
 	log.Codec().Info("join group req", req)
-	lowReq := &low.JoinGroupReq{}
+	lowReq := &service.JoinGroupReq{}
 	lowReq.GroupId = req.GroupId
 	lowReq.SessionTimeout = req.SessionTimeout
 	lowReq.MemberId = req.MemberId
 	lowReq.GroupInstanceId = req.GroupInstanceId
 	lowReq.ProtocolType = req.ProtocolType
-	lowReq.GroupProtocols = make([]*low.GroupProtocol, len(req.GroupProtocols))
+	lowReq.GroupProtocols = make([]*service.GroupProtocol, len(req.GroupProtocols))
 	for i, groupProtocol := range req.GroupProtocols {
-		g := &low.GroupProtocol{}
+		g := &service.GroupProtocol{}
 		g.ProtocolName = groupProtocol.ProtocolName
 		g.ProtocolMetadata = groupProtocol.ProtocolMetadata
 		lowReq.GroupProtocols[i] = g

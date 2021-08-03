@@ -1,4 +1,4 @@
-package low
+package service
 
 type SyncGroupReq struct {
 	GroupId          string

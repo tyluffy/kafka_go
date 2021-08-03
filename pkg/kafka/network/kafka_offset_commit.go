@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -23,20 +23,20 @@ func (s *Server) OffsetCommitVersion(ctx *context.NetworkContext, frame []byte, 
 		return nil, gnet.Close
 	}
 	log.Codec().Info("offset commit req ", req)
-	lowReqList := make([]*low.OffsetCommitTopicReq, len(req.OffsetCommitTopicReqList))
+	lowReqList := make([]*service.OffsetCommitTopicReq, len(req.OffsetCommitTopicReqList))
 	for i, topicReq := range req.OffsetCommitTopicReqList {
-		lowTopicReq := &low.OffsetCommitTopicReq{}
+		lowTopicReq := &service.OffsetCommitTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.OffsetCommitPartitionReqList = make([]*low.OffsetCommitPartitionReq, len(topicReq.OffsetTopicPartitions))
+		lowTopicReq.OffsetCommitPartitionReqList = make([]*service.OffsetCommitPartitionReq, len(topicReq.OffsetTopicPartitions))
 		for j, partitionReq := range topicReq.OffsetTopicPartitions {
-			lowPartitionReq := &low.OffsetCommitPartitionReq{}
+			lowPartitionReq := &service.OffsetCommitPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowPartitionReq.OffsetCommitOffset = partitionReq.Offset
 			lowTopicReq.OffsetCommitPartitionReqList[j] = lowPartitionReq
 		}
 		lowReqList[i] = lowTopicReq
 	}
-	lowTopicRespList, err := low.OffsetCommit(ctx.Addr, s.kafkaImpl, lowReqList)
+	lowTopicRespList, err := service.OffsetCommit(ctx.Addr, s.kafkaImpl, lowReqList)
 	if err != nil {
 		return nil, gnet.Close
 	}

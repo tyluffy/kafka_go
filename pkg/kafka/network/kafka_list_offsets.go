@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -23,19 +23,19 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 		return nil, gnet.Close
 	}
 	log.Codec().Info("list offset req ", req)
-	lowOffsetReqList := make([]*low.ListOffsetsTopicReq, len(req.OffsetTopics))
+	lowOffsetReqList := make([]*service.ListOffsetsTopicReq, len(req.OffsetTopics))
 	for i, topicReq := range req.OffsetTopics {
-		lowTopicReq := &low.ListOffsetsTopicReq{}
+		lowTopicReq := &service.ListOffsetsTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.OffsetPartitionReqList = make([]*low.ListOffsetsPartitionReq, len(topicReq.OffsetTopicPartitions))
+		lowTopicReq.OffsetPartitionReqList = make([]*service.ListOffsetsPartitionReq, len(topicReq.OffsetTopicPartitions))
 		for j, partitionReq := range topicReq.OffsetTopicPartitions {
-			lowPartitionReq := &low.ListOffsetsPartitionReq{}
+			lowPartitionReq := &service.ListOffsetsPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowTopicReq.OffsetPartitionReqList[j] = lowPartitionReq
 		}
 		lowOffsetReqList[i] = lowTopicReq
 	}
-	lowOffsetRespList, err := low.Offset(ctx.Addr, s.kafkaImpl, lowOffsetReqList)
+	lowOffsetRespList, err := service.Offset(ctx.Addr, s.kafkaImpl, lowOffsetReqList)
 	if err != nil {
 		return nil, gnet.Close
 	}

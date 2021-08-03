@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -23,11 +23,11 @@ func (s *Server) ReactLeaveGroupVersion(ctx *context.NetworkContext, frame []byt
 		return nil, gnet.Close
 	}
 	log.Codec().Info("leave group req ", req)
-	lowReq := &low.LeaveGroupReq{}
+	lowReq := &service.LeaveGroupReq{}
 	lowReq.GroupId = req.GroupId
-	lowReq.Members = make([]*low.LeaveGroupMember, len(req.Members))
+	lowReq.Members = make([]*service.LeaveGroupMember, len(req.Members))
 	for i, member := range req.Members {
-		m := &low.LeaveGroupMember{}
+		m := &service.LeaveGroupMember{}
 		m.MemberId = member.MemberId
 		m.GroupInstanceId = member.GroupInstanceId
 		lowReq.Members[i] = m

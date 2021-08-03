@@ -5,7 +5,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"k8s.io/klog/v2"
 	"os"
 )
@@ -25,7 +25,7 @@ type ServerConfig struct {
 	AdvertisePort int
 }
 
-func Run(config *ServerConfig, impl low.KfkServer) (*ServerControl, error) {
+func Run(config *ServerConfig, impl service.KfkServer) (*ServerControl, error) {
 	flagSet := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(flagSet)
 	_ = flagSet.Set("v", config.LogLevel)

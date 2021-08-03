@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -24,7 +24,7 @@ func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, cont
 	}
 	log.Codec().Info("sasl handshake request ", req)
 	saslHandshakeResp := codec.NewSaslHandshakeAuthResp(req.CorrelationId)
-	authResult, errorCode := low.SaslAuth(s.kafkaImpl, req.Username, req.Password)
+	authResult, errorCode := service.SaslAuth(s.kafkaImpl, req.Username, req.Password)
 	if errorCode != 0 {
 		return nil, gnet.Close
 	}

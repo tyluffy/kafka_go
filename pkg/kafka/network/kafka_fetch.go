@@ -4,7 +4,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -23,21 +23,21 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 		return nil, gnet.Close
 	}
 	log.Codec().Info("fetch req ", req)
-	lowReq := &low.FetchReq{}
-	lowReq.FetchTopicReqList = make([]*low.FetchTopicReq, len(req.FetchTopics))
+	lowReq := &service.FetchReq{}
+	lowReq.FetchTopicReqList = make([]*service.FetchTopicReq, len(req.FetchTopics))
 	for i, topicReq := range req.FetchTopics {
-		lowTopicReq := &low.FetchTopicReq{}
+		lowTopicReq := &service.FetchTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.FetchPartitionReqList = make([]*low.FetchPartitionReq, len(topicReq.FetchTopicPartitions))
+		lowTopicReq.FetchPartitionReqList = make([]*service.FetchPartitionReq, len(topicReq.FetchTopicPartitions))
 		for j, partitionReq := range topicReq.FetchTopicPartitions {
-			lowPartitionReq := &low.FetchPartitionReq{}
+			lowPartitionReq := &service.FetchPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowPartitionReq.FetchOffset = partitionReq.FetchOffset
 			lowTopicReq.FetchPartitionReqList[j] = lowPartitionReq
 		}
 		lowReq.FetchTopicReqList[i] = lowTopicReq
 	}
-	lowTopicRespList, err := low.Fetch(ctx.Addr, s.kafkaImpl, lowReq)
+	lowTopicRespList, err := service.Fetch(ctx.Addr, s.kafkaImpl, lowReq)
 	if err != nil {
 		return nil, gnet.Close
 	}
@@ -65,7 +65,7 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 	return resp.Bytes(version), gnet.None
 }
 
-func (s *Server) convertRecordBatch(recordBatch *codec.RecordBatch, lowRecordBatch *low.RecordBatch) {
+func (s *Server) convertRecordBatch(recordBatch *codec.RecordBatch, lowRecordBatch *service.RecordBatch) {
 	recordBatch.Offset = lowRecordBatch.Offset
 	recordBatch.MessageSize = lowRecordBatch.MessageSize
 	recordBatch.LeaderEpoch = 0

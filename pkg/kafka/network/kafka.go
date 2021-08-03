@@ -7,7 +7,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/kafka/codec/api"
 	"github.com/paashzj/kafka_go/pkg/kafka/log"
 	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service/low"
+	"github.com/paashzj/kafka_go/pkg/kafka/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 	"sync"
@@ -24,7 +24,7 @@ type Config struct {
 	MultiCore  bool
 }
 
-func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl low.KfkServer) (*Server, error) {
+func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl service.KfkServer) (*Server, error) {
 	server := &Server{
 		EventServer:         nil,
 		kafkaProtocolConfig: kfkProtocolConfig,
@@ -51,7 +51,7 @@ type Server struct {
 	*gnet.EventServer
 	ConnMap             sync.Map
 	kafkaProtocolConfig *codec.KafkaProtocolConfig
-	kafkaImpl           low.KfkServer
+	kafkaImpl           service.KfkServer
 }
 
 func (s *Server) OnInitComplete(server gnet.Server) (action gnet.Action) {

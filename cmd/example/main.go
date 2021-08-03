@@ -20,8 +20,8 @@ var advertiseListenPort = flag.Int("advertise_port", 9092, "kafka advertise port
 func main() {
 	flag.Parse()
 	serverConfig := &kafka.ServerConfig{}
-	serverConfig.ListenAddr = *listenAddr
 	serverConfig.LogLevel = *logLevel
+	serverConfig.ListenAddr = *listenAddr
 	serverConfig.MultiCore = *multiCore
 	serverConfig.NeedSasl = *needSasl
 	serverConfig.ClusterId = *clusterId
