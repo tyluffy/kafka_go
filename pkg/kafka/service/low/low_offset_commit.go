@@ -1,6 +1,8 @@
 package low
 
-import "net"
+import (
+	"net"
+)
 
 type OffsetCommitTopicReq struct {
 	Topic                        string
@@ -22,7 +24,7 @@ type OffsetCommitPartitionResp struct {
 	ErrorCode   ErrorCode
 }
 
-func OffsetCommit(addr *net.Addr, impl KfkImpl, reqList []*OffsetCommitTopicReq) ([]*OffsetCommitTopicResp, error) {
+func OffsetCommit(addr *net.Addr, impl KfkServer, reqList []*OffsetCommitTopicReq) ([]*OffsetCommitTopicResp, error) {
 	result := make([]*OffsetCommitTopicResp, len(reqList))
 	for i, req := range reqList {
 		f := &OffsetCommitTopicResp{}

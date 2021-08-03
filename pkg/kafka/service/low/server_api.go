@@ -1,8 +1,10 @@
 package low
 
-import "net"
+import (
+	"net"
+)
 
-type KfkImpl interface {
+type KfkServer interface {
 	FetchPartition(addr *net.Addr, topic string, req *FetchPartitionReq) (*FetchPartitionResp, error)
 
 	GroupJoin(addr *net.Addr, req *JoinGroupReq) (*JoinGroupResp, error)
@@ -20,4 +22,6 @@ type KfkImpl interface {
 	SaslAuth(username string, password string) (bool, ErrorCode)
 
 	Disconnect(addr *net.Addr)
+
+	Available(addr *net.Addr) bool
 }

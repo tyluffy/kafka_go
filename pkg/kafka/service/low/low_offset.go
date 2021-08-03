@@ -1,6 +1,8 @@
 package low
 
-import "net"
+import (
+	"net"
+)
 
 type ListOffsetsTopicReq struct {
 	Topic                  string
@@ -22,7 +24,7 @@ type ListOffsetsPartitionResp struct {
 	Offset      int64
 }
 
-func Offset(addr *net.Addr, impl KfkImpl, reqList []*ListOffsetsTopicReq) ([]*ListOffsetsTopicResp, error) {
+func Offset(addr *net.Addr, impl KfkServer, reqList []*ListOffsetsTopicReq) ([]*ListOffsetsTopicResp, error) {
 	result := make([]*ListOffsetsTopicResp, len(reqList))
 	for i, req := range reqList {
 		f := &ListOffsetsTopicResp{}

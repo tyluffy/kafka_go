@@ -29,7 +29,7 @@ func main() {
 	serverConfig.AdvertisePort = *advertiseListenPort
 	serverConfig.MaxConn = int32(*maxConn)
 	e := &ExampleKafkaImpl{}
-	err := kafka.Run(serverConfig, e)
+	_, err := kafka.Run(serverConfig, e)
 	if err != nil {
 		klog.Error(err)
 	}

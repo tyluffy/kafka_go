@@ -1,6 +1,8 @@
 package low
 
-import "net"
+import (
+	"net"
+)
 
 type FetchReq struct {
 	MinBytes          int
@@ -50,7 +52,7 @@ type Record struct {
 	Headers           []byte
 }
 
-func Fetch(addr *net.Addr, impl KfkImpl, req *FetchReq) ([]*FetchTopicResp, error) {
+func Fetch(addr *net.Addr, impl KfkServer, req *FetchReq) ([]*FetchTopicResp, error) {
 	reqList := req.FetchTopicReqList
 	result := make([]*FetchTopicResp, len(reqList))
 	for i, req := range reqList {

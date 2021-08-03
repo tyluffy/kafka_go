@@ -25,7 +25,7 @@ type ServerConfig struct {
 	AdvertisePort int
 }
 
-func Run(config *ServerConfig, impl low.KfkImpl) error {
+func Run(config *ServerConfig, impl low.KfkServer) (*ServerControl, error) {
 	flagSet := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(flagSet)
 	_ = flagSet.Set("v", config.LogLevel)
@@ -41,6 +41,8 @@ func Run(config *ServerConfig, impl low.KfkImpl) error {
 	kfkProtocolConfig.AdvertisePort = config.AdvertisePort
 	kfkProtocolConfig.NeedSasl = config.NeedSasl
 	kfkProtocolConfig.MaxConn = config.MaxConn
-	err := network.Run(networkConfig, kfkProtocolConfig, impl)
-	return err
+	serverControl := &ServerControl{}
+	var err error
+	serverControl.networkServer, err = network.Run(networkConfig, kfkProtocolConfig, impl)
+	return serverControl, err
 }

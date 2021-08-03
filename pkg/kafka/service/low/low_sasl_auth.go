@@ -1,5 +1,5 @@
 package low
 
-func SaslAuth(impl KfkImpl, username string, password string) (bool, ErrorCode) {
+func SaslAuth(impl KfkServer, username string, password string) (bool, ErrorCode) {
 	return impl.SaslAuth(username, password)
 }

@@ -24,7 +24,7 @@ type Config struct {
 	MultiCore  bool
 }
 
-func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl low.KfkImpl) error {
+func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl low.KfkServer) (*Server, error) {
 	server := &Server{
 		EventServer:         nil,
 		kafkaProtocolConfig: kfkProtocolConfig,
@@ -44,13 +44,14 @@ func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl low.
 		InitialBytesToStrip: 4,
 	}
 	kfkCodec := gnet.NewLengthFieldBasedFrameCodec(encoderConfig, decoderConfig)
-	return gnet.Serve(server, fmt.Sprintf("tcp://%s:9092", config.ListenAddr), gnet.WithMulticore(config.MultiCore), gnet.WithCodec(kfkCodec))
+	return server, gnet.Serve(server, fmt.Sprintf("tcp://%s:9092", config.ListenAddr), gnet.WithMulticore(config.MultiCore), gnet.WithCodec(kfkCodec))
 }
 
 type Server struct {
 	*gnet.EventServer
+	ConnMap             sync.Map
 	kafkaProtocolConfig *codec.KafkaProtocolConfig
-	kafkaImpl           low.KfkImpl
+	kafkaImpl           low.KfkServer
 }
 
 func (s *Server) OnInitComplete(server gnet.Server) (action gnet.Action) {
@@ -75,6 +76,9 @@ func (s *Server) React(frame []byte, c gnet.Conn) ([]byte, gnet.Action) {
 	connMutex.Unlock()
 	ctx = c.Context()
 	networkContext := ctx.(*context.NetworkContext)
+	if !s.kafkaImpl.Available(networkContext.Addr) {
+		return nil, gnet.Close
+	}
 	apiKey := api.Code(binary.BigEndian.Uint16(frame))
 	apiVersion := int16(binary.BigEndian.Uint16(frame[2:]))
 	if apiKey == api.ApiVersions {
@@ -153,12 +157,14 @@ func (s *Server) OnOpened(c gnet.Conn) (out []byte, action gnet.Action) {
 		return nil, gnet.Close
 	}
 	connCount := atomic.AddInt32(&connCount, 1)
+	s.ConnMap.Store(c.RemoteAddr(), c)
 	klog.Info("new connection connected ", connCount, " from ", c.RemoteAddr())
 	return
 }
 
 func (s *Server) OnClosed(c gnet.Conn, err error) (action gnet.Action) {
 	klog.Info("connection closed from ", c.RemoteAddr())
+	s.ConnMap.Delete(c.RemoteAddr())
 	atomic.AddInt32(&connCount, -1)
 	return
 }
