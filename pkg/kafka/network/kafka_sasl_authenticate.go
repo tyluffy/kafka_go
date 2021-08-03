@@ -24,12 +24,14 @@ func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, cont
 	}
 	log.Codec().Info("sasl handshake request ", req)
 	saslHandshakeResp := codec.NewSaslHandshakeAuthResp(req.CorrelationId)
-	authResult, errorCode := service.SaslAuth(s.kafkaImpl, req.Username, req.Password)
+	saslReq := service.SaslReq{Username: req.Username, Password: req.Password}
+	authResult, errorCode := service.SaslAuth(s.kafkaImpl, saslReq)
 	if errorCode != 0 {
 		return nil, gnet.Close
 	}
 	if authResult {
 		context.Authed(true)
+		s.SaslMap.Store(context.Addr, saslReq)
 		return saslHandshakeResp.Bytes(version), gnet.None
 	} else {
 		return nil, gnet.Close

@@ -18,6 +18,10 @@ func (s *Server) OffsetCommit(ctx *context.NetworkContext, frame []byte, version
 }
 
 func (s *Server) OffsetCommitVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+	saslReq, ok := s.SaslMap.Load(ctx.Addr)
+	if !ok {
+		return nil, gnet.Close
+	}
 	req, err := codec.DecodeOffsetCommitReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
@@ -25,6 +29,10 @@ func (s *Server) OffsetCommitVersion(ctx *context.NetworkContext, frame []byte, 
 	log.Codec().Info("offset commit req ", req)
 	lowReqList := make([]*service.OffsetCommitTopicReq, len(req.OffsetCommitTopicReqList))
 	for i, topicReq := range req.OffsetCommitTopicReqList {
+		res, code := s.kafkaImpl.SaslAuthTopic(saslReq.(service.SaslReq), topicReq.Topic)
+		if code != 0 || !res {
+			return nil, gnet.Close
+		}
 		lowTopicReq := &service.OffsetCommitTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
 		lowTopicReq.OffsetCommitPartitionReqList = make([]*service.OffsetCommitPartitionReq, len(topicReq.OffsetTopicPartitions))

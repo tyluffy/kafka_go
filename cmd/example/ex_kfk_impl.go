@@ -98,8 +98,18 @@ func (e ExampleKafkaImpl) OffsetFetch(addr *net.Addr, topic string, partition in
 	return nil, nil
 }
 
-func (e ExampleKafkaImpl) SaslAuth(username string, password string) (bool, service.ErrorCode) {
-	klog.Info("username ", username, "password ", password)
+func (e ExampleKafkaImpl) SaslAuth(req service.SaslReq) (bool, service.ErrorCode) {
+	klog.Info("username ", req.Username, "password ", req.Password)
+	return true, service.NONE
+}
+
+func (e ExampleKafkaImpl) SaslAuthTopic(req service.SaslReq, topic string) (bool, service.ErrorCode) {
+	klog.Info("username ", req.Username, "password ", req.Password, "topic ", topic)
+	return true, service.NONE
+}
+
+func (e ExampleKafkaImpl) SaslAuthConsumerGroup(req service.SaslReq, consumerGroup string) (bool, service.ErrorCode) {
+	klog.Info("username ", req.Username, "password ", req.Password, "group ", consumerGroup)
 	return true, service.NONE
 }
 

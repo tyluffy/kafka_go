@@ -18,6 +18,10 @@ func (s *Server) ListOffsets(ctx *context.NetworkContext, frame []byte, version 
 }
 
 func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+	saslReq, ok := s.SaslMap.Load(ctx.Addr)
+	if !ok {
+		return nil, gnet.Close
+	}
 	req, err := codec.DecodeListOffsetReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
@@ -25,6 +29,10 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 	log.Codec().Info("list offset req ", req)
 	lowOffsetReqList := make([]*service.ListOffsetsTopicReq, len(req.OffsetTopics))
 	for i, topicReq := range req.OffsetTopics {
+		res, code := s.kafkaImpl.SaslAuthTopic(saslReq.(service.SaslReq), topicReq.Topic)
+		if code != 0 || !res {
+			return nil, gnet.Close
+		}
 		lowTopicReq := &service.ListOffsetsTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
 		lowTopicReq.OffsetPartitionReqList = make([]*service.ListOffsetsPartitionReq, len(topicReq.OffsetTopicPartitions))

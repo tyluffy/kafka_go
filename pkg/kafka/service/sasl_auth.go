@@ -1,5 +1,10 @@
 package service
 
-func SaslAuth(impl KfkServer, username string, password string) (bool, ErrorCode) {
-	return impl.SaslAuth(username, password)
+type SaslReq struct {
+	Username string
+	Password string
+}
+
+func SaslAuth(impl KfkServer, req SaslReq) (bool, ErrorCode) {
+	return impl.SaslAuth(req)
 }
