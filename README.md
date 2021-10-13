@@ -1,4 +1,5 @@
 # kafka_go
+[![codecov](https://codecov.io/gh/paashzj/kafka_go/branch/main/graph/badge.svg?token=155QKNN7MQ)](https://codecov.io/gh/paashzj/kafka_go)
 ## 其他语言文档
 - [English Doc](README_en.md)
 
