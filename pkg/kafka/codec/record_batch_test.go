@@ -1,6 +1,7 @@
 package codec
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -25,7 +26,5 @@ func Test_Marshal(t *testing.T) {
 	record.Key = nil
 	record.Value = "ShootHzj"
 	r.Records[0] = record
-	if r.BytesLength() != 76 {
-		t.Errorf("calculate length error.")
-	}
+	assert.Equal(t, 76, r.BytesLength())
 }
