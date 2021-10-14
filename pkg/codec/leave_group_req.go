@@ -8,9 +8,8 @@ import (
 
 type LeaveGroupReq struct {
 	BaseReq
-	ClientId string
-	GroupId  string
-	Members  []*LeaveGroupMember
+	GroupId string
+	Members []*LeaveGroupMember
 }
 
 func DecodeLeaveGroupReq(bytes []byte, version int16) (leaveGroupReq *LeaveGroupReq, err error) {

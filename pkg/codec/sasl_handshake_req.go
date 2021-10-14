@@ -8,7 +8,6 @@ import (
 
 type SaslHandshakeReq struct {
 	BaseReq
-	ClientId      string
 	SaslMechanism string
 }
 

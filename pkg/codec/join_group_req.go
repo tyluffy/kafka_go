@@ -8,7 +8,6 @@ import (
 
 type JoinGroupReq struct {
 	BaseReq
-	ClientId         string
 	GroupId          string
 	SessionTimeout   int
 	RebalanceTimeout int

@@ -8,7 +8,6 @@ import (
 
 type HeartBeatReq struct {
 	BaseReq
-	ClientId        string
 	GroupId         string
 	GenerationId    int
 	MemberId        string

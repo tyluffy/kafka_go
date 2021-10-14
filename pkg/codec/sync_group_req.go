@@ -8,7 +8,6 @@ import (
 
 type SyncGroupReq struct {
 	BaseReq
-	ClientId         string
 	GroupId          string
 	GenerationId     int
 	MemberId         string

@@ -8,7 +8,6 @@ import (
 
 type SaslAuthenticateReq struct {
 	BaseReq
-	ClientId string
 	Username string
 	Password string
 }
