@@ -82,8 +82,8 @@ func putReplicaId(bytes []byte, idx int, x int) int {
 	return putInt(bytes, idx, x)
 }
 
-func readReplicaId(bytes []byte, idx int) (int, int) {
-	return readInt(bytes, idx)
+func readReplicaId(bytes []byte, idx int) (int32, int) {
+	return readInt32(bytes, idx)
 }
 
 func putThrottleTime(bytes []byte, idx int, x int) int {

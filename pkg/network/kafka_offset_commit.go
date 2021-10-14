@@ -33,8 +33,8 @@ func (s *Server) OffsetCommitVersion(ctx *context.NetworkContext, frame []byte, 
 		}
 		lowTopicReq := &service.OffsetCommitTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.OffsetCommitPartitionReqList = make([]*service.OffsetCommitPartitionReq, len(topicReq.OffsetTopicPartitions))
-		for j, partitionReq := range topicReq.OffsetTopicPartitions {
+		lowTopicReq.OffsetCommitPartitionReqList = make([]*service.OffsetCommitPartitionReq, len(topicReq.OffsetPartitions))
+		for j, partitionReq := range topicReq.OffsetPartitions {
 			lowPartitionReq := &service.OffsetCommitPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowPartitionReq.OffsetCommitOffset = partitionReq.Offset

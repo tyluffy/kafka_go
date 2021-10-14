@@ -33,8 +33,8 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 		}
 		lowTopicReq := &service.ListOffsetsTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.OffsetPartitionReqList = make([]*service.ListOffsetsPartitionReq, len(topicReq.OffsetTopicPartitions))
-		for j, partitionReq := range topicReq.OffsetTopicPartitions {
+		lowTopicReq.OffsetPartitionReqList = make([]*service.ListOffsetsPartitionReq, len(topicReq.ListOffsetPartitions))
+		for j, partitionReq := range topicReq.ListOffsetPartitions {
 			lowPartitionReq := &service.ListOffsetsPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowTopicReq.OffsetPartitionReqList[j] = lowPartitionReq
@@ -45,12 +45,12 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec.NewOffsetResp(req.CorrelationId)
+	resp := codec.NewListOffsetResp(req.CorrelationId)
 	resp.OffsetTopics = make([]*codec.ListOffsetTopicResp, len(lowOffsetRespList))
 	for i, lowTopicResp := range lowOffsetRespList {
 		f := &codec.ListOffsetTopicResp{}
 		f.Topic = lowTopicResp.Topic
-		f.OffsetTopicPartitions = make([]*codec.ListOffsetPartitionResp, len(lowTopicResp.OffsetPartitionRespList))
+		f.ListOffsetPartitions = make([]*codec.ListOffsetPartitionResp, len(lowTopicResp.OffsetPartitionRespList))
 		for j, p := range lowTopicResp.OffsetPartitionRespList {
 			partitionResp := &codec.ListOffsetPartitionResp{}
 			partitionResp.PartitionId = p.PartitionId
@@ -58,7 +58,7 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 			partitionResp.Timestamp = p.Time
 			partitionResp.Offset = p.Offset
 			partitionResp.LeaderEpoch = 0
-			f.OffsetTopicPartitions[j] = partitionResp
+			f.ListOffsetPartitions[j] = partitionResp
 		}
 		resp.OffsetTopics[i] = f
 	}

@@ -19,11 +19,11 @@ type FetchReq struct {
 }
 
 type FetchTopicReq struct {
-	Topic                string
-	FetchTopicPartitions []*FetchTopicPartitionReq
+	Topic           string
+	FetchPartitions []*FetchPartitionReq
 }
 
-type FetchTopicPartitionReq struct {
+type FetchPartitionReq struct {
 	PartitionId        int
 	CurrentLeaderEpoch int
 	FetchOffset        int64
@@ -59,15 +59,15 @@ func DecodeFetchReq(bytes []byte, version int16) (fetchReq *FetchReq, err error)
 		topicReq.Topic, idx = readTopicString(bytes, idx)
 		var pLen int
 		pLen, idx = readArrayLen(bytes, idx)
-		topicReq.FetchTopicPartitions = make([]*FetchTopicPartitionReq, pLen)
+		topicReq.FetchPartitions = make([]*FetchPartitionReq, pLen)
 		for j := 0; j < pLen; j++ {
-			partition := &FetchTopicPartitionReq{}
+			partition := &FetchPartitionReq{}
 			partition.PartitionId, idx = readInt(bytes, idx)
 			partition.CurrentLeaderEpoch, idx = readInt(bytes, idx)
 			partition.FetchOffset, idx = readInt64(bytes, idx)
 			partition.LogStartOffset, idx = readInt64(bytes, idx)
 			partition.PartitionMaxBytes, idx = readInt(bytes, idx)
-			topicReq.FetchTopicPartitions[i] = partition
+			topicReq.FetchPartitions[i] = partition
 		}
 		fetchReq.FetchTopics[i] = &topicReq
 	}

@@ -16,8 +16,8 @@ type OffsetCommitReq struct {
 }
 
 type OffsetCommitTopicReq struct {
-	Topic                 string
-	OffsetTopicPartitions []*OffsetCommitPartitionReq
+	Topic            string
+	OffsetPartitions []*OffsetCommitPartitionReq
 }
 
 type OffsetCommitPartitionReq struct {
@@ -52,7 +52,7 @@ func DecodeOffsetCommitReq(bytes []byte, version int16) (offsetReq *OffsetCommit
 		topic.Topic, idx = readTopic(bytes, idx)
 		var partitionLength int
 		partitionLength, idx = readCompactArrayLen(bytes, idx)
-		topic.OffsetTopicPartitions = make([]*OffsetCommitPartitionReq, partitionLength)
+		topic.OffsetPartitions = make([]*OffsetCommitPartitionReq, partitionLength)
 		for j := 0; j < partitionLength; j++ {
 			partition := &OffsetCommitPartitionReq{}
 			partition.PartitionId, idx = readInt(bytes, idx)
@@ -60,7 +60,7 @@ func DecodeOffsetCommitReq(bytes []byte, version int16) (offsetReq *OffsetCommit
 			partition.LeaderEpoch, idx = readLeaderEpoch(bytes, idx)
 			partition.Metadata, idx = readCompactString(bytes, idx)
 			idx = readTaggedField(bytes, idx)
-			topic.OffsetTopicPartitions[j] = partition
+			topic.OffsetPartitions[j] = partition
 		}
 		idx = readTaggedField(bytes, idx)
 		offsetReq.OffsetCommitTopicReqList[i] = topic

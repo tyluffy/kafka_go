@@ -8,14 +8,14 @@ import (
 
 type ListOffsetReq struct {
 	BaseReq
-	ReplicaId      int
+	ReplicaId      int32
 	IsolationLevel byte
 	OffsetTopics   []*ListOffsetTopic
 }
 
 type ListOffsetTopic struct {
-	Topic                 string
-	OffsetTopicPartitions []*ListOffsetPartition
+	Topic                string
+	ListOffsetPartitions []*ListOffsetPartition
 }
 
 type ListOffsetPartition struct {
@@ -46,13 +46,13 @@ func DecodeListOffsetReq(bytes []byte, version int16) (offsetReq *ListOffsetReq,
 		topic.Topic, idx = readTopicString(bytes, idx)
 		var partitionLength int
 		partitionLength, idx := readInt(bytes, idx)
-		topic.OffsetTopicPartitions = make([]*ListOffsetPartition, partitionLength)
+		topic.ListOffsetPartitions = make([]*ListOffsetPartition, partitionLength)
 		for j := 0; j < partitionLength; j++ {
 			partition := &ListOffsetPartition{}
 			partition.PartitionId, idx = readInt(bytes, idx)
 			partition.LeaderEpoch, idx = readLeaderEpoch(bytes, idx)
 			partition.Time, idx = readTime(bytes, idx)
-			topic.OffsetTopicPartitions[j] = partition
+			topic.ListOffsetPartitions[j] = partition
 		}
 		offsetReq.OffsetTopics[i] = topic
 	}

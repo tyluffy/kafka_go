@@ -34,8 +34,8 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 		}
 		lowTopicReq := &service.FetchTopicReq{}
 		lowTopicReq.Topic = topicReq.Topic
-		lowTopicReq.FetchPartitionReqList = make([]*service.FetchPartitionReq, len(topicReq.FetchTopicPartitions))
-		for j, partitionReq := range topicReq.FetchTopicPartitions {
+		lowTopicReq.FetchPartitionReqList = make([]*service.FetchPartitionReq, len(topicReq.FetchPartitions))
+		for j, partitionReq := range topicReq.FetchPartitions {
 			lowPartitionReq := &service.FetchPartitionReq{}
 			lowPartitionReq.PartitionId = partitionReq.PartitionId
 			lowPartitionReq.FetchOffset = partitionReq.FetchOffset
@@ -48,13 +48,13 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 		return nil, gnet.Close
 	}
 	resp := codec.NewFetchResp(req.CorrelationId)
-	resp.TopicResponses = make([]*codec.FetchTopicResponse, len(lowTopicRespList))
+	resp.TopicResponses = make([]*codec.FetchTopicResp, len(lowTopicRespList))
 	for i, lowTopicResp := range lowTopicRespList {
-		f := &codec.FetchTopicResponse{}
+		f := &codec.FetchTopicResp{}
 		f.Topic = lowTopicResp.Topic
-		f.PartitionDataList = make([]*codec.FetchPartitionDataResp, len(lowTopicResp.FetchPartitionRespList))
+		f.PartitionDataList = make([]*codec.FetchPartitionResp, len(lowTopicResp.FetchPartitionRespList))
 		for j, p := range lowTopicResp.FetchPartitionRespList {
-			partitionResp := &codec.FetchPartitionDataResp{}
+			partitionResp := &codec.FetchPartitionResp{}
 			partitionResp.PartitionIndex = p.PartitionId
 			partitionResp.ErrorCode = 0
 			partitionResp.HighWatermark = p.HighWatermark

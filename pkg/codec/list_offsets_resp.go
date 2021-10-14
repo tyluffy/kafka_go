@@ -8,8 +8,8 @@ type ListOffsetResp struct {
 }
 
 type ListOffsetTopicResp struct {
-	Topic                 string
-	OffsetTopicPartitions []*ListOffsetPartitionResp
+	Topic                string
+	ListOffsetPartitions []*ListOffsetPartitionResp
 }
 
 type ListOffsetPartitionResp struct {
@@ -20,7 +20,7 @@ type ListOffsetPartitionResp struct {
 	LeaderEpoch int
 }
 
-func NewOffsetResp(corrId int) *ListOffsetResp {
+func NewListOffsetResp(corrId int) *ListOffsetResp {
 	resp := ListOffsetResp{}
 	resp.CorrelationId = corrId
 	return &resp
@@ -30,7 +30,7 @@ func (o *ListOffsetResp) BytesLength(version int16) int {
 	result := LenCorrId + LenThrottleTime + LenArray
 	for _, val := range o.OffsetTopics {
 		result += StrLen(val.Topic) + LenArray
-		for range val.OffsetTopicPartitions {
+		for range val.ListOffsetPartitions {
 			result += LenPartitionId + LenErrorCode + LenTime + LenOffset + LenLeaderEpoch
 		}
 	}
@@ -45,8 +45,8 @@ func (o *ListOffsetResp) Bytes(version int16) []byte {
 	idx = putArrayLen(bytes, idx, len(o.OffsetTopics))
 	for _, topic := range o.OffsetTopics {
 		idx = putTopicString(bytes, idx, topic.Topic)
-		idx = putArrayLen(bytes, idx, len(topic.OffsetTopicPartitions))
-		for _, p := range topic.OffsetTopicPartitions {
+		idx = putArrayLen(bytes, idx, len(topic.ListOffsetPartitions))
+		for _, p := range topic.ListOffsetPartitions {
 			idx = putInt(bytes, idx, p.PartitionId)
 			idx = putErrorCode(bytes, idx, p.ErrorCode)
 			idx = putInt64(bytes, idx, p.Timestamp)

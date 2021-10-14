@@ -5,15 +5,15 @@ type FetchResp struct {
 	ThrottleTime   int
 	ErrorCode      int16
 	SessionId      int
-	TopicResponses []*FetchTopicResponse
+	TopicResponses []*FetchTopicResp
 }
 
-type FetchTopicResponse struct {
+type FetchTopicResp struct {
 	Topic             string
-	PartitionDataList []*FetchPartitionDataResp
+	PartitionDataList []*FetchPartitionResp
 }
 
-type FetchPartitionDataResp struct {
+type FetchPartitionResp struct {
 	PartitionIndex      int
 	ErrorCode           int16
 	HighWatermark       int64
