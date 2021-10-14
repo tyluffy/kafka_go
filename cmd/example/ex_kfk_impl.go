@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/paashzj/kafka_go/pkg/kafka/service"
+	service2 "github.com/paashzj/kafka_go/pkg/service"
 	"k8s.io/klog/v2"
 	"net"
 )
@@ -11,8 +11,8 @@ import (
 type ExampleKafkaImpl struct {
 }
 
-func (e ExampleKafkaImpl) FetchPartition(addr *net.Addr, topic string, req *service.FetchPartitionReq) (*service.FetchPartitionResp, error) {
-	partitionResp := &service.FetchPartitionResp{}
+func (e ExampleKafkaImpl) FetchPartition(addr *net.Addr, topic string, req *service2.FetchPartitionReq) (*service2.FetchPartitionResp, error) {
+	partitionResp := &service2.FetchPartitionResp{}
 	partitionResp.PartitionId = req.PartitionId
 	partitionResp.HighWatermark = 1
 	partitionResp.LastStableOffset = 1
@@ -21,16 +21,16 @@ func (e ExampleKafkaImpl) FetchPartition(addr *net.Addr, topic string, req *serv
 	return partitionResp, nil
 }
 
-func exampleRecordBatch() *service.RecordBatch {
-	r := &service.RecordBatch{}
+func exampleRecordBatch() *service2.RecordBatch {
+	r := &service2.RecordBatch{}
 	r.Offset = 0
 	r.MessageSize = 64
 	r.LastOffsetDelta = 0
 	r.FirstTimestamp = 1625962021853
 	r.LastTimestamp = 1625962021853
 	r.BaseSequence = -1
-	r.Records = make([]*service.Record, 1)
-	record := &service.Record{}
+	r.Records = make([]*service2.Record, 1)
+	record := &service2.Record{}
 	record.RelativeTimestamp = 0
 	record.RelativeOffset = 0
 	record.Key = nil
@@ -39,18 +39,18 @@ func exampleRecordBatch() *service.RecordBatch {
 	return r
 }
 
-func (e ExampleKafkaImpl) GroupJoin(addr *net.Addr, req *service.JoinGroupReq) (*service.JoinGroupResp, error) {
-	resp := &service.JoinGroupResp{}
+func (e ExampleKafkaImpl) GroupJoin(addr *net.Addr, req *service2.JoinGroupReq) (*service2.JoinGroupResp, error) {
+	resp := &service2.JoinGroupResp{}
 	if req.MemberId == "" {
-		resp.ErrorCode = service.MEMBER_ID_REQUIRED
+		resp.ErrorCode = service2.MEMBER_ID_REQUIRED
 		resp.GenerationId = -1
 		resp.ProtocolName = ""
 		resp.MemberId = uuid.New().String()
 		return resp, nil
 	}
-	members := make([]*service.Member, 1)
+	members := make([]*service2.Member, 1)
 	groupProtocols := req.GroupProtocols
-	members[0] = &service.Member{MemberId: req.MemberId,
+	members[0] = &service2.Member{MemberId: req.MemberId,
 		GroupInstanceId: nil, Metadata: groupProtocols[0].ProtocolMetadata}
 	resp.GenerationId = 1
 	resp.ProtocolName = "range"
@@ -60,14 +60,14 @@ func (e ExampleKafkaImpl) GroupJoin(addr *net.Addr, req *service.JoinGroupReq) (
 	return resp, nil
 }
 
-func (e ExampleKafkaImpl) GroupLeave(addr *net.Addr, req *service.LeaveGroupReq) (*service.LeaveGroupResp, error) {
-	l := &service.LeaveGroupResp{}
+func (e ExampleKafkaImpl) GroupLeave(addr *net.Addr, req *service2.LeaveGroupReq) (*service2.LeaveGroupResp, error) {
+	l := &service2.LeaveGroupResp{}
 	return l, nil
 }
 
-func (e ExampleKafkaImpl) GroupSync(addr *net.Addr, req *service.SyncGroupReq) (*service.SyncGroupResp, error) {
+func (e ExampleKafkaImpl) GroupSync(addr *net.Addr, req *service2.SyncGroupReq) (*service2.SyncGroupResp, error) {
 	groupAssignments := req.GroupAssignments
-	resp := &service.SyncGroupResp{}
+	resp := &service2.SyncGroupResp{}
 	if req.ProtocolType == "" {
 		resp.ProtocolType = ""
 		resp.ProtocolName = ""
@@ -79,38 +79,38 @@ func (e ExampleKafkaImpl) GroupSync(addr *net.Addr, req *service.SyncGroupReq) (
 	return resp, nil
 }
 
-func (e ExampleKafkaImpl) OffsetListPartition(addr *net.Addr, topic string, req *service.ListOffsetsPartitionReq) (*service.ListOffsetsPartitionResp, error) {
-	partitionResp := &service.ListOffsetsPartitionResp{}
+func (e ExampleKafkaImpl) OffsetListPartition(addr *net.Addr, topic string, req *service2.ListOffsetsPartitionReq) (*service2.ListOffsetsPartitionResp, error) {
+	partitionResp := &service2.ListOffsetsPartitionResp{}
 	partitionResp.PartitionId = req.PartitionId
 	partitionResp.Time = -1
 	partitionResp.Offset = 0
 	return partitionResp, nil
 }
 
-func (e ExampleKafkaImpl) OffsetCommitPartition(addr *net.Addr, topic string, req *service.OffsetCommitPartitionReq) (*service.OffsetCommitPartitionResp, error) {
-	partitionResp := &service.OffsetCommitPartitionResp{}
+func (e ExampleKafkaImpl) OffsetCommitPartition(addr *net.Addr, topic string, req *service2.OffsetCommitPartitionReq) (*service2.OffsetCommitPartitionResp, error) {
+	partitionResp := &service2.OffsetCommitPartitionResp{}
 	partitionResp.PartitionId = req.PartitionId
 	partitionResp.ErrorCode = 0
 	return partitionResp, nil
 }
 
-func (e ExampleKafkaImpl) OffsetFetch(addr *net.Addr, topic string, partition int) (*service.OffsetFetchPartitionResp, error) {
+func (e ExampleKafkaImpl) OffsetFetch(addr *net.Addr, topic string, partition int) (*service2.OffsetFetchPartitionResp, error) {
 	return nil, nil
 }
 
-func (e ExampleKafkaImpl) SaslAuth(req service.SaslReq) (bool, service.ErrorCode) {
+func (e ExampleKafkaImpl) SaslAuth(req service2.SaslReq) (bool, service2.ErrorCode) {
 	klog.Info("username ", req.Username, "password ", req.Password)
-	return true, service.NONE
+	return true, service2.NONE
 }
 
-func (e ExampleKafkaImpl) SaslAuthTopic(req service.SaslReq, topic string) (bool, service.ErrorCode) {
+func (e ExampleKafkaImpl) SaslAuthTopic(req service2.SaslReq, topic string) (bool, service2.ErrorCode) {
 	klog.Info("username ", req.Username, "password ", req.Password, "topic ", topic)
-	return true, service.NONE
+	return true, service2.NONE
 }
 
-func (e ExampleKafkaImpl) SaslAuthConsumerGroup(req service.SaslReq, consumerGroup string) (bool, service.ErrorCode) {
+func (e ExampleKafkaImpl) SaslAuthConsumerGroup(req service2.SaslReq, consumerGroup string) (bool, service2.ErrorCode) {
 	klog.Info("username ", req.Username, "password ", req.Password, "group ", consumerGroup)
-	return true, service.NONE
+	return true, service2.NONE
 }
 
 func (e ExampleKafkaImpl) Disconnect(addr *net.Addr) {

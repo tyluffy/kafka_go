@@ -1,6 +1,8 @@
 package codec
 
-import "github.com/paashzj/kafka_go/pkg/kafka/codec/api"
+import (
+	"github.com/paashzj/kafka_go/pkg/codec/api"
+)
 
 type ApiResponse struct {
 	BaseResp

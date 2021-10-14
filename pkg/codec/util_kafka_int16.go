@@ -1,6 +1,8 @@
 package codec
 
-import "github.com/paashzj/kafka_go/pkg/kafka/codec/api"
+import (
+	"github.com/paashzj/kafka_go/pkg/codec/api"
+)
 
 // This file is for kafka code int16 type. Format method as alpha order.
 

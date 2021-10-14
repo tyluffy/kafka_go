@@ -1,10 +1,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/kafka/codec"
-	"github.com/paashzj/kafka_go/pkg/kafka/log"
-	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service"
+	codec2 "github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/log"
+	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -18,7 +18,7 @@ func (s *Server) Fetch(ctx *context.NetworkContext, frame []byte, version int16)
 }
 
 func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec.DecodeFetchReq(frame, version)
+	req, err := codec2.DecodeFetchReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
@@ -47,20 +47,20 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec.NewFetchResp(req.CorrelationId)
-	resp.TopicResponses = make([]*codec.FetchTopicResponse, len(lowTopicRespList))
+	resp := codec2.NewFetchResp(req.CorrelationId)
+	resp.TopicResponses = make([]*codec2.FetchTopicResponse, len(lowTopicRespList))
 	for i, lowTopicResp := range lowTopicRespList {
-		f := &codec.FetchTopicResponse{}
+		f := &codec2.FetchTopicResponse{}
 		f.Topic = lowTopicResp.Topic
-		f.PartitionDataList = make([]*codec.FetchPartitionDataResp, len(lowTopicResp.FetchPartitionRespList))
+		f.PartitionDataList = make([]*codec2.FetchPartitionDataResp, len(lowTopicResp.FetchPartitionRespList))
 		for j, p := range lowTopicResp.FetchPartitionRespList {
-			partitionResp := &codec.FetchPartitionDataResp{}
+			partitionResp := &codec2.FetchPartitionDataResp{}
 			partitionResp.PartitionIndex = p.PartitionId
 			partitionResp.ErrorCode = 0
 			partitionResp.HighWatermark = p.HighWatermark
 			partitionResp.LastStableOffset = p.LastStableOffset
 			partitionResp.LogStartOffset = p.LogStartOffset
-			partitionResp.RecordBatch = &codec.RecordBatch{}
+			partitionResp.RecordBatch = &codec2.RecordBatch{}
 			s.convertRecordBatch(partitionResp.RecordBatch, p.RecordBatch)
 			partitionResp.AbortedTransactions = -1
 			partitionResp.ReplicaData = -1
@@ -71,7 +71,7 @@ func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, ve
 	return resp.Bytes(version), gnet.None
 }
 
-func (s *Server) convertRecordBatch(recordBatch *codec.RecordBatch, lowRecordBatch *service.RecordBatch) {
+func (s *Server) convertRecordBatch(recordBatch *codec2.RecordBatch, lowRecordBatch *service.RecordBatch) {
 	recordBatch.Offset = lowRecordBatch.Offset
 	recordBatch.MessageSize = lowRecordBatch.MessageSize
 	recordBatch.LeaderEpoch = 0
@@ -83,9 +83,9 @@ func (s *Server) convertRecordBatch(recordBatch *codec.RecordBatch, lowRecordBat
 	recordBatch.ProducerId = -1
 	recordBatch.ProducerEpoch = -1
 	recordBatch.BaseSequence = lowRecordBatch.BaseSequence
-	recordBatch.Records = make([]*codec.Record, len(lowRecordBatch.Records))
+	recordBatch.Records = make([]*codec2.Record, len(lowRecordBatch.Records))
 	for i, r := range lowRecordBatch.Records {
-		record := &codec.Record{}
+		record := &codec2.Record{}
 		record.RecordAttributes = 0
 		record.RelativeTimestamp = r.RelativeTimestamp
 		record.RelativeOffset = r.RelativeOffset

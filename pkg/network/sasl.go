@@ -1,8 +1,8 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
-	"github.com/paashzj/kafka_go/pkg/kafka/service"
+	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/service"
 )
 
 func (s *Server) checkSasl(ctx *context.NetworkContext) bool {

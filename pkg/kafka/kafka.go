@@ -2,10 +2,10 @@ package kafka
 
 import (
 	"flag"
-	"github.com/paashzj/kafka_go/pkg/kafka/codec"
-	"github.com/paashzj/kafka_go/pkg/kafka/log"
-	"github.com/paashzj/kafka_go/pkg/kafka/network"
-	"github.com/paashzj/kafka_go/pkg/kafka/service"
+	"github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/log"
+	"github.com/paashzj/kafka_go/pkg/network"
+	"github.com/paashzj/kafka_go/pkg/service"
 	"k8s.io/klog/v2"
 	"os"
 )

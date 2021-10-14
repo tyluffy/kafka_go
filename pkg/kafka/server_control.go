@@ -2,7 +2,7 @@ package kafka
 
 import (
 	"errors"
-	"github.com/paashzj/kafka_go/pkg/kafka/network"
+	"github.com/paashzj/kafka_go/pkg/network"
 	"github.com/panjf2000/gnet"
 	"net"
 )

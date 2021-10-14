@@ -1,7 +1,7 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/kafka/codec"
+	codec2 "github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
@@ -15,11 +15,11 @@ func (s *Server) Heartbeat(frame []byte, version int16) ([]byte, gnet.Action) {
 }
 
 func (s *Server) ReactHeartbeatVersion(frame []byte, version int16) ([]byte, gnet.Action) {
-	heartbeatReqV4, err := codec.DecodeHeartbeatReqV4(frame)
+	heartbeatReqV4, err := codec2.DecodeHeartbeatReqV4(frame)
 	if err != nil {
 		return nil, gnet.Close
 	}
 	klog.Info("heart beat req ", heartbeatReqV4)
-	heartBeatResp := codec.NewHeartBeatResp(heartbeatReqV4.CorrelationId)
+	heartBeatResp := codec2.NewHeartBeatResp(heartbeatReqV4.CorrelationId)
 	return heartBeatResp.Bytes(), gnet.None
 }

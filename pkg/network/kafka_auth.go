@@ -1,7 +1,7 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/kafka/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/context"
 	"github.com/panjf2000/gnet"
 	"k8s.io/klog/v2"
 )
