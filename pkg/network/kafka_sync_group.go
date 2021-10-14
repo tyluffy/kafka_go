@@ -1,7 +1,7 @@
 package network
 
 import (
-	codec2 "github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/log"
 	"github.com/paashzj/kafka_go/pkg/network/context"
 	"github.com/paashzj/kafka_go/pkg/service"
@@ -18,7 +18,7 @@ func (s *Server) SyncGroup(ctx *context.NetworkContext, frame []byte, version in
 }
 
 func (s *Server) ReactSyncGroupVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec2.DecodeSyncGroupReq(frame, version)
+	req, err := codec.DecodeSyncGroupReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
@@ -40,7 +40,7 @@ func (s *Server) ReactSyncGroupVersion(ctx *context.NetworkContext, frame []byte
 		g.MemberId = groupAssignment.MemberId
 		lowReq.GroupAssignments[i] = g
 	}
-	resp := codec2.NewSyncGroupResp(req.CorrelationId)
+	resp := codec.NewSyncGroupResp(req.CorrelationId)
 	lowResp, err := s.kafkaImpl.GroupSync(ctx.Addr, lowReq)
 	if err != nil {
 		return nil, gnet.Close

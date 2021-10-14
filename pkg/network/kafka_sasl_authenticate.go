@@ -1,7 +1,7 @@
 package network
 
 import (
-	codec2 "github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/log"
 	"github.com/paashzj/kafka_go/pkg/network/context"
 	"github.com/paashzj/kafka_go/pkg/service"
@@ -18,12 +18,12 @@ func (s *Server) SaslAuthenticate(frame []byte, version int16, context *context.
 }
 
 func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, context *context.NetworkContext) ([]byte, gnet.Action) {
-	req, err := codec2.DecodeSaslHandshakeAuthReq(frame, version)
+	req, err := codec.DecodeSaslHandshakeAuthReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
 	log.Codec().Info("sasl handshake request ", req)
-	saslHandshakeResp := codec2.NewSaslHandshakeAuthResp(req.CorrelationId)
+	saslHandshakeResp := codec.NewSaslHandshakeAuthResp(req.CorrelationId)
 	saslReq := service.SaslReq{Username: req.Username, Password: req.Password}
 	authResult, errorCode := service.SaslAuth(s.kafkaImpl, saslReq)
 	if errorCode != 0 {

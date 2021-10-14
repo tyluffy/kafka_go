@@ -1,7 +1,7 @@
 package network
 
 import (
-	codec2 "github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/log"
 	"github.com/paashzj/kafka_go/pkg/network/context"
 	"github.com/paashzj/kafka_go/pkg/service"
@@ -18,7 +18,7 @@ func (s *Server) OffsetFetch(ctx *context.NetworkContext, frame []byte, version 
 }
 
 func (s *Server) OffsetFetchVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec2.DecodeOffsetFetchReq(frame, version)
+	req, err := codec.DecodeOffsetFetchReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
@@ -46,15 +46,15 @@ func (s *Server) OffsetFetchVersion(ctx *context.NetworkContext, frame []byte, v
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec2.NewOffsetFetchResp(req.CorrelationId)
+	resp := codec.NewOffsetFetchResp(req.CorrelationId)
 	resp.ErrorCode = lowResp.ErrorCode
-	resp.TopicRespList = make([]*codec2.OffsetFetchTopicResp, len(lowResp.TopicRespList))
+	resp.TopicRespList = make([]*codec.OffsetFetchTopicResp, len(lowResp.TopicRespList))
 	for i, lowTopicResp := range lowResp.TopicRespList {
-		f := &codec2.OffsetFetchTopicResp{}
+		f := &codec.OffsetFetchTopicResp{}
 		f.Topic = lowTopicResp.Topic
-		f.PartitionRespList = make([]*codec2.OffsetFetchPartitionResp, len(lowTopicResp.PartitionRespList))
+		f.PartitionRespList = make([]*codec.OffsetFetchPartitionResp, len(lowTopicResp.PartitionRespList))
 		for j, p := range lowTopicResp.PartitionRespList {
-			partitionResp := &codec2.OffsetFetchPartitionResp{}
+			partitionResp := &codec.OffsetFetchPartitionResp{}
 			partitionResp.PartitionId = p.PartitionId
 			partitionResp.Offset = p.Offset
 			partitionResp.LeaderEpoch = p.LeaderEpoch

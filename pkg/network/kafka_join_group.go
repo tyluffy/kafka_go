@@ -1,7 +1,7 @@
 package network
 
 import (
-	codec2 "github.com/paashzj/kafka_go/pkg/codec"
+	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/log"
 	"github.com/paashzj/kafka_go/pkg/network/context"
 	"github.com/paashzj/kafka_go/pkg/service"
@@ -18,7 +18,7 @@ func (s *Server) JoinGroup(ctx *context.NetworkContext, frame []byte, version in
 }
 
 func (s *Server) ReactJoinGroupVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec2.DecodeJoinGroupReq(frame, version)
+	req, err := codec.DecodeJoinGroupReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
@@ -39,7 +39,7 @@ func (s *Server) ReactJoinGroupVersion(ctx *context.NetworkContext, frame []byte
 		g.ProtocolMetadata = groupProtocol.ProtocolMetadata
 		lowReq.GroupProtocols[i] = g
 	}
-	resp := codec2.NewJoinGroupResp(req.CorrelationId)
+	resp := codec.NewJoinGroupResp(req.CorrelationId)
 	lowResp, err := s.kafkaImpl.GroupJoin(ctx.Addr, lowReq)
 	if err != nil {
 		return nil, gnet.Close
@@ -51,9 +51,9 @@ func (s *Server) ReactJoinGroupVersion(ctx *context.NetworkContext, frame []byte
 	resp.ProtocolName = lowResp.ProtocolName
 	resp.LeaderId = lowResp.LeaderId
 	resp.MemberId = lowResp.MemberId
-	resp.Members = make([]*codec2.Member, len(lowResp.Members))
+	resp.Members = make([]*codec.Member, len(lowResp.Members))
 	for i, lowMember := range lowResp.Members {
-		m := &codec2.Member{}
+		m := &codec.Member{}
 		m.MemberId = lowMember.MemberId
 		m.GroupInstanceId = lowMember.GroupInstanceId
 		m.Metadata = lowMember.Metadata
