@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func TestDecodeIllegalApiVersionReq(t *testing.T) {
+	bytes := make([]byte, 0)
+	_, err := DecodeApiReq(bytes, 0)
+	assert.NotNil(t, err)
+}
+
 func TestDecodeApiVersionReqV3(t *testing.T) {
 	bytes := testHex2Bytes(t, "00000001002f636f6e73756d65722d37336664633964612d306439322d346537622d613761372d6563323636663637633137312d3100126170616368652d6b61666b612d6a61766106322e342e3000")
 	apiReq, err := DecodeApiReq(bytes, 3)

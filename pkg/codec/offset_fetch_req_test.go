@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func TestDecodeIllegalOffsetFetchReq(t *testing.T) {
+	bytes := make([]byte, 0)
+	_, err := DecodeOffsetFetchReq(bytes, 0)
+	assert.NotNil(t, err)
+}
+
 func TestDecodeOffsetFetchReq(t *testing.T) {
 	bytes := testHex2Bytes(t, "0000000b002f636f6e73756d65722d61303332616233632d303831382d343937352d626439332d3735613431323030656162342d31002561303332616233632d303831382d343937352d626439332d373561343132303065616234020a746573742d7361736c02000000000000")
 	fetchReq, err := DecodeOffsetFetchReq(bytes, 6)

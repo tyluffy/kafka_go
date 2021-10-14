@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func TestDecodeIllegalMetadataReq(t *testing.T) {
+	bytes := make([]byte, 0)
+	_, err := DecodeMetadataTopicReq(bytes, 0)
+	assert.NotNil(t, err)
+}
+
 func TestDecodeMetadataV9(t *testing.T) {
 	bytes := testHex2Bytes(t, "00000002002f636f6e73756d65722d37336664633964612d306439322d346537622d613761372d6563323636663637633137312d3100022537363465646565332d303037652d343865302d623966392d6466376637313366663730370001000000")
 	metadataTopicReq, err := DecodeMetadataTopicReq(bytes, 9)

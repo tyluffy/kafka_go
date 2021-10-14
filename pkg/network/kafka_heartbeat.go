@@ -15,7 +15,7 @@ func (s *Server) Heartbeat(frame []byte, version int16) ([]byte, gnet.Action) {
 }
 
 func (s *Server) ReactHeartbeatVersion(frame []byte, version int16) ([]byte, gnet.Action) {
-	heartbeatReqV4, err := codec.DecodeHeartbeatReqV4(frame)
+	heartbeatReqV4, err := codec.DecodeHeartbeatReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
 	}
