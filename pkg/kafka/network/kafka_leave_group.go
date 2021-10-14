@@ -18,16 +18,11 @@ func (s *Server) LeaveGroup(ctx *context.NetworkContext, frame []byte, version i
 }
 
 func (s *Server) ReactLeaveGroupVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	saslReq, ok := s.SaslMap.Load(ctx.Addr)
-	if !ok {
-		return nil, gnet.Close
-	}
 	req, err := codec.DecodeLeaveGroupReq(frame, version)
-	res, code := s.kafkaImpl.SaslAuthConsumerGroup(saslReq.(service.SaslReq), req.GroupId)
-	if code != 0 || !res {
+	if err != nil {
 		return nil, gnet.Close
 	}
-	if err != nil {
+	if !s.checkSaslGroup(ctx, req.GroupId) {
 		return nil, gnet.Close
 	}
 	log.Codec().Info("leave group req ", req)

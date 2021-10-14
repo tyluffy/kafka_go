@@ -18,20 +18,18 @@ func (s *Server) Fetch(ctx *context.NetworkContext, frame []byte, version int16)
 }
 
 func (s *Server) ReactFetchVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	saslReq, ok := s.SaslMap.Load(ctx.Addr)
-	if !ok {
-		return nil, gnet.Close
-	}
 	req, err := codec.DecodeFetchReq(frame, version)
 	if err != nil {
+		return nil, gnet.Close
+	}
+	if !s.checkSasl(ctx) {
 		return nil, gnet.Close
 	}
 	log.Codec().Info("fetch req ", req)
 	lowReq := &service.FetchReq{}
 	lowReq.FetchTopicReqList = make([]*service.FetchTopicReq, len(req.FetchTopics))
 	for i, topicReq := range req.FetchTopics {
-		res, code := s.kafkaImpl.SaslAuthTopic(saslReq.(service.SaslReq), topicReq.Topic)
-		if code != 0 || !res {
+		if !s.checkSaslTopic(ctx, topicReq.Topic) {
 			return nil, gnet.Close
 		}
 		lowTopicReq := &service.FetchTopicReq{}
