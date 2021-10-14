@@ -15,9 +15,8 @@ func TestDecodeJoinGroupReqV6(t *testing.T) {
 	assert.Equal(t, 10_000, joinGroupReq.SessionTimeout)
 	assert.Equal(t, 300_000, joinGroupReq.RebalanceTimeout)
 	assert.Equal(t, "", joinGroupReq.MemberId)
-	assert.Equal(t, nil, joinGroupReq.GroupInstanceId)
 	assert.Equal(t, "consumer", joinGroupReq.ProtocolType)
-	assert.Len(t, 1, len(joinGroupReq.GroupProtocols))
+	assert.Len(t, joinGroupReq.GroupProtocols, 1)
 	groupProtocol := joinGroupReq.GroupProtocols[0]
 	assert.Equal(t, "range", groupProtocol.ProtocolName)
 }
