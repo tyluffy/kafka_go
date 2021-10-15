@@ -17,7 +17,7 @@ func NewSaslHandshakeResp(corrId int) *SaslHandshakeResp {
 }
 
 func (s *SaslHandshakeResp) BytesLength() int {
-	length := LenCorrId + LenErrorCode + LenArray + len(s.EnableMechanisms)
+	length := LenCorrId + LenErrorCode + LenArray
 	for _, val := range s.EnableMechanisms {
 		length += StrLen(val.SaslMechanism)
 	}

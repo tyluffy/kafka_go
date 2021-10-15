@@ -28,6 +28,7 @@ func DecodeSaslHandshakeAuthReq(bytes []byte, version int16) (authReq *SaslAuthe
 	if version == 1 {
 		saslBytes, idx = readBytes(bytes, idx)
 	} else if version == 2 {
+		idx = readTaggedField(bytes, idx)
 		saslBytes, idx = readCompactBytes(bytes, idx)
 	}
 	authReq.Username, authReq.Password = readSaslAuthBytes(saslBytes, 0)

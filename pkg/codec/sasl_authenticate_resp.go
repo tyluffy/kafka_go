@@ -20,7 +20,18 @@ func (s *SaslAuthenticateResp) BytesLength(version int16) int {
 	if version == 2 {
 		result += LenTaggedField
 	}
-	result += LenErrorCode + (len(s.ErrorMessage) + 2) + (len(s.AuthBytes) + 4) + LenSessionTimeout
+	result += LenErrorCode
+	if version == 1 {
+		result += StrLen(s.ErrorMessage)
+	} else if version == 2 {
+		result += CompactStrLen(s.ErrorMessage)
+	}
+	if version == 1 {
+		result += BytesLen(s.AuthBytes)
+	} else if version == 2 {
+		result += CompactBytesLen(s.AuthBytes)
+	}
+	result += LenSessionTimeout
 	if version == 2 {
 		result += LenTaggedField
 	}
