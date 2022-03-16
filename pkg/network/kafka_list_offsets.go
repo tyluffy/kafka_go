@@ -72,7 +72,7 @@ func (s *Server) ListOffsetsVersion(ctx *context.NetworkContext, frame []byte, v
 		for j, p := range lowTopicResp.OffsetPartitionRespList {
 			partitionResp := &codec.ListOffsetPartitionResp{}
 			partitionResp.PartitionId = p.PartitionId
-			partitionResp.ErrorCode = 0
+			partitionResp.ErrorCode = int16(p.ErrorCode)
 			partitionResp.Timestamp = p.Time
 			partitionResp.Offset = p.Offset
 			partitionResp.LeaderEpoch = 0
