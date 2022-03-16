@@ -38,6 +38,7 @@ type ListOffsetsPartitionReq struct {
 }
 
 type ListOffsetsPartitionResp struct {
+	ErrorCode   ErrorCode
 	PartitionId int
 	Time        int64
 	Offset      int64
