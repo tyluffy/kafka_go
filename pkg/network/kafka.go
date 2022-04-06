@@ -26,6 +26,7 @@ import (
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
+	"runtime/debug"
 	"sync"
 	"sync/atomic"
 )
@@ -83,7 +84,13 @@ func (s *Server) OnInitComplete(server gnet.Server) (action gnet.Action) {
 
 // React Kafka 协议格式为APIKey和API Version
 // APIKey 样例: 00 12
-func (s *Server) React(frame []byte, c gnet.Conn) ([]byte, gnet.Action) {
+func (s *Server) React(frame []byte, c gnet.Conn) (bytes []byte, g gnet.Action) {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Warn("Recovered in f", r, string(debug.Stack()))
+			g = gnet.Close
+		}
+	}()
 	logrus.Debug("frame len is ", len(frame))
 	if len(frame) < 5 {
 		logrus.Error("invalid data packet")
