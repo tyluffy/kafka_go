@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/panjf2000/gnet v1.6.5
+	github.com/panjf2000/gnet v1.6.6
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
 )
