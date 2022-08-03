@@ -18,11 +18,11 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 )
 
-func (s *Server) checkSasl(ctx *context.NetworkContext) bool {
+func (s *Server) checkSasl(ctx *ctx.NetworkContext) bool {
 	if !s.kafkaProtocolConfig.NeedSasl {
 		return true
 	}
@@ -30,7 +30,7 @@ func (s *Server) checkSasl(ctx *context.NetworkContext) bool {
 	return ok
 }
 
-func (s *Server) checkSaslGroup(ctx *context.NetworkContext, groupId string) bool {
+func (s *Server) checkSaslGroup(ctx *ctx.NetworkContext, groupId string) bool {
 	if !s.kafkaProtocolConfig.NeedSasl {
 		return true
 	}
@@ -45,7 +45,7 @@ func (s *Server) checkSaslGroup(ctx *context.NetworkContext, groupId string) boo
 	return true
 }
 
-func (s *Server) checkSaslTopic(ctx *context.NetworkContext, topic, permissionType string) bool {
+func (s *Server) checkSaslTopic(ctx *ctx.NetworkContext, topic, permissionType string) bool {
 	if !s.kafkaProtocolConfig.NeedSasl {
 		return true
 	}

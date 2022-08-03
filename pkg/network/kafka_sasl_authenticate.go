@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) SaslAuthenticate(frame []byte, version int16, context *context.NetworkContext) ([]byte, gnet.Action) {
+func (s *Server) SaslAuthenticate(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
 	if version == 1 || version == 2 {
 		return s.ReactSaslHandshakeAuthVersion(frame, version, context)
 	}
@@ -33,7 +33,7 @@ func (s *Server) SaslAuthenticate(frame []byte, version int16, context *context.
 	return nil, gnet.Close
 }
 
-func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, context *context.NetworkContext) ([]byte, gnet.Action) {
+func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
 	req, err := codec.DecodeSaslHandshakeAuthReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close

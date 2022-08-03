@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) Metadata(ctx *context.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
+func (s *Server) Metadata(ctx *ctx.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
 	if version == 1 || version == 9 {
 		return s.ReactMetadataVersion(ctx, frame, version, config)
 	}
@@ -33,7 +33,7 @@ func (s *Server) Metadata(ctx *context.NetworkContext, frame []byte, version int
 	return nil, gnet.Close
 }
 
-func (s *Server) ReactMetadataVersion(ctx *context.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
+func (s *Server) ReactMetadataVersion(ctx *ctx.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
 	metadataTopicReq, err := codec.DecodeMetadataTopicReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close

@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) OffsetFetch(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) OffsetFetch(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	if version == 1 || version == 6 || version == 7 {
 		return s.OffsetFetchVersion(ctx, frame, version)
 	}
@@ -33,7 +33,7 @@ func (s *Server) OffsetFetch(ctx *context.NetworkContext, frame []byte, version 
 	return nil, gnet.Close
 }
 
-func (s *Server) OffsetFetchVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) OffsetFetchVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	req, err := codec.DecodeOffsetFetchReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close

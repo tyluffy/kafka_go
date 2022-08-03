@@ -18,12 +18,12 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) Authed(context *context.NetworkContext) bool {
+func (s *Server) Authed(context *ctx.NetworkContext) bool {
 	if !s.kafkaProtocolConfig.NeedSasl {
 		return true
 	}

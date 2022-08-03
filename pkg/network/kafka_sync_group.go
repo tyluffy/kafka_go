@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) SyncGroup(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) SyncGroup(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	if version == 1 || version == 4 || version == 5 {
 		return s.ReactSyncGroupVersion(ctx, frame, version)
 	}
@@ -33,7 +33,7 @@ func (s *Server) SyncGroup(ctx *context.NetworkContext, frame []byte, version in
 	return nil, gnet.Close
 }
 
-func (s *Server) ReactSyncGroupVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) ReactSyncGroupVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	req, err := codec.DecodeSyncGroupReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close

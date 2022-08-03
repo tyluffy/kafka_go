@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) OffsetForLeaderEpoch(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) OffsetForLeaderEpoch(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	if version == 3 {
 		return s.OffsetForLeaderEpochVersion(ctx, frame, version)
 	}
@@ -33,7 +33,7 @@ func (s *Server) OffsetForLeaderEpoch(ctx *context.NetworkContext, frame []byte,
 	return nil, gnet.Close
 }
 
-func (s *Server) OffsetForLeaderEpochVersion(ctx *context.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
+func (s *Server) OffsetForLeaderEpochVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
 	req, err := codec.DecodeOffsetLeaderEpochReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close

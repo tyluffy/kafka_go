@@ -18,11 +18,12 @@
 package network
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/codec/api"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
@@ -36,6 +37,8 @@ var connCount int32
 
 var connMutex sync.Mutex
 
+var serverConfig *Config
+
 type Config struct {
 	ListenHost   string
 	ListenPort   int
@@ -43,6 +46,7 @@ type Config struct {
 }
 
 func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl service.KfkServer) (*Server, error) {
+	serverConfig = config
 	server := &Server{
 		EventServer:         nil,
 		kafkaProtocolConfig: kfkProtocolConfig,
@@ -67,6 +71,14 @@ func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl serv
 		logrus.Error("kafsar broker started error ", err)
 	}()
 	return server, nil
+}
+
+func Close() (err error) {
+	if serverConfig != nil {
+		addr := fmt.Sprintf("tcp://%s:%d", serverConfig.ListenHost, serverConfig.ListenPort)
+		err = gnet.Stop(context.Background(), addr)
+	}
+	return
 }
 
 type Server struct {
@@ -97,14 +109,14 @@ func (s *Server) React(frame []byte, c gnet.Conn) (bytes []byte, g gnet.Action) 
 		return nil, gnet.Close
 	}
 	connMutex.Lock()
-	ctx := c.Context()
-	if ctx == nil {
+	connCtx := c.Context()
+	if connCtx == nil {
 		addr := c.RemoteAddr()
-		c.SetContext(&context.NetworkContext{Addr: addr})
+		c.SetContext(&ctx.NetworkContext{Addr: addr})
 	}
 	connMutex.Unlock()
-	ctx = c.Context()
-	networkContext := ctx.(*context.NetworkContext)
+	connCtx = c.Context()
+	networkContext := connCtx.(*ctx.NetworkContext)
 	apiKey := api.Code(binary.BigEndian.Uint16(frame))
 	apiVersion := int16(binary.BigEndian.Uint16(frame[2:]))
 	if apiKey == api.ApiVersions {

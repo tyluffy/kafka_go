@@ -19,13 +19,13 @@ package network
 
 import (
 	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/network/context"
+	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) Heartbeat(frame []byte, version int16, context *context.NetworkContext) ([]byte, gnet.Action) {
+func (s *Server) Heartbeat(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
 	if version == 4 {
 		return s.ReactHeartbeatVersion(frame, version, context)
 	}
@@ -33,7 +33,7 @@ func (s *Server) Heartbeat(frame []byte, version int16, context *context.Network
 	return nil, gnet.Close
 }
 
-func (s *Server) ReactHeartbeatVersion(frame []byte, version int16, context *context.NetworkContext) ([]byte, gnet.Action) {
+func (s *Server) ReactHeartbeatVersion(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
 	heartbeatReqV4, err := codec.DecodeHeartbeatReq(frame, version)
 	if err != nil {
 		return nil, gnet.Close
