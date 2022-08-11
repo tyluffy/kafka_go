@@ -119,84 +119,72 @@ func (s *Server) React(frame []byte, c gnet.Conn) (bytes []byte, g gnet.Action) 
 	networkContext := connCtx.(*ctx.NetworkContext)
 	apiKey := api.Code(binary.BigEndian.Uint16(frame))
 	apiVersion := int16(binary.BigEndian.Uint16(frame[2:]))
-	if apiKey == api.ApiVersions {
+	switch apiKey {
+	case api.ApiVersions:
 		return s.ApiVersions(frame[4:], apiVersion)
-	}
-	if apiKey == api.SaslHandshake {
+	case api.SaslHandshake:
 		return s.SaslHandshake(frame[4:], apiVersion)
-	}
-	if apiKey == api.SaslAuthenticate {
+	case api.SaslAuthenticate:
 		return s.SaslAuthenticate(frame[4:], apiVersion, networkContext)
-	}
-	if apiKey == api.Heartbeat {
+	case api.Heartbeat:
 		return s.Heartbeat(frame[4:], apiVersion, networkContext)
-	}
-	if apiKey == api.JoinGroup {
+	case api.JoinGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.JoinGroup(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.SyncGroup {
+	case api.SyncGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.SyncGroup(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.OffsetFetch {
+	case api.OffsetFetch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetFetch(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.ListOffsets {
+	case api.ListOffsets:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.ListOffsets(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.Fetch {
+	case api.Fetch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Fetch(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.OffsetCommit {
+	case api.OffsetCommit:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetCommit(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.OffsetForLeaderEpoch {
+	case api.OffsetForLeaderEpoch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetForLeaderEpoch(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.LeaveGroup {
+	case api.LeaveGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.LeaveGroup(networkContext, frame[4:], apiVersion)
-	}
-	if apiKey == api.Produce {
+	case api.Produce:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Produce(networkContext, frame[4:], apiVersion, s.kafkaProtocolConfig)
-	}
-	if apiKey == api.Metadata {
+	case api.Metadata:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Metadata(networkContext, frame[4:], apiVersion, s.kafkaProtocolConfig)
-	}
-	if apiKey == api.FindCoordinator {
+	case api.FindCoordinator:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.FindCoordinator(frame[4:], apiVersion, s.kafkaProtocolConfig)
 	}
+
 	logrus.Error("unknown api ", apiKey, apiVersion)
 	return nil, gnet.Close
 }
