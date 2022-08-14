@@ -18,12 +18,12 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) FindCoordinator(frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
+func (s *Server) FindCoordinator(frame []byte, version int16, config *KafkaProtocolConfig) ([]byte, gnet.Action) {
 	if version == 0 || version == 3 {
 		return s.FindCoordinatorVersion(frame, version, config)
 	}
@@ -31,13 +31,18 @@ func (s *Server) FindCoordinator(frame []byte, version int16, config *codec.Kafk
 	return nil, gnet.Close
 }
 
-func (s *Server) FindCoordinatorVersion(frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
-	req, err := codec.DecodeFindCoordinatorReq(frame, version)
-	if err != nil {
+func (s *Server) FindCoordinatorVersion(frame []byte, version int16, config *KafkaProtocolConfig) ([]byte, gnet.Action) {
+	req, r, stack := codec.DecodeFindCoordinatorReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	logrus.Debug("req ", req)
-	resp := codec.NewFindCoordinatorResp(req.CorrelationId, config)
+	resp := codec.FindCoordinatorResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: req.CorrelationId,
+		},
+	}
 	logrus.Debug("resp ", resp)
 	return resp.Bytes(version), gnet.None
 }

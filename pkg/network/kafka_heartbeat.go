@@ -18,10 +18,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,12 +34,17 @@ func (s *Server) Heartbeat(frame []byte, version int16, context *ctx.NetworkCont
 }
 
 func (s *Server) ReactHeartbeatVersion(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
-	heartbeatReqV4, err := codec.DecodeHeartbeatReq(frame, version)
-	if err != nil {
+	heartbeatReqV4, r, stack := codec.DecodeHeartbeatReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	logrus.Debug("heart beat req ", heartbeatReqV4)
-	heartBeatResp := codec.NewHeartBeatResp(heartbeatReqV4.CorrelationId)
+	heartBeatResp := codec.HeartBeatResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: heartbeatReqV4.CorrelationId,
+		},
+	}
 	req := service.HeartBeatReq{}
 	req.ClientId = heartbeatReqV4.ClientId
 	req.GenerationId = heartbeatReqV4.GenerationId

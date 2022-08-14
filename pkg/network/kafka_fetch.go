@@ -18,10 +18,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,8 +34,9 @@ func (s *Server) Fetch(ctx *ctx.NetworkContext, frame []byte, version int16) ([]
 }
 
 func (s *Server) ReactFetchVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec.DecodeFetchReq(frame, version)
-	if err != nil {
+	req, r, stack := codec.DecodeFetchReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	if !s.checkSasl(ctx) {

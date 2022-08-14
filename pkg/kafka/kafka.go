@@ -18,7 +18,6 @@
 package kafka
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network"
 	"github.com/paashzj/kafka_go/pkg/service"
 )
@@ -42,7 +41,7 @@ func Run(config *ServerConfig, impl service.KfkServer) (*ServerControl, error) {
 	networkConfig.ListenHost = config.ListenHost
 	networkConfig.ListenPort = config.ListenPort
 	networkConfig.EventLoopNum = config.EventLoopNum
-	kfkProtocolConfig := &codec.KafkaProtocolConfig{}
+	kfkProtocolConfig := &network.KafkaProtocolConfig{}
 	kfkProtocolConfig.ClusterId = config.ClusterId
 	kfkProtocolConfig.AdvertiseHost = config.AdvertiseHost
 	kfkProtocolConfig.AdvertisePort = config.AdvertisePort

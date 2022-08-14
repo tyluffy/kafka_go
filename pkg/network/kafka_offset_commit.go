@@ -18,10 +18,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,8 +34,9 @@ func (s *Server) OffsetCommit(ctx *ctx.NetworkContext, frame []byte, version int
 }
 
 func (s *Server) OffsetCommitVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec.DecodeOffsetCommitReq(frame, version)
-	if err != nil {
+	req, r, stack := codec.DecodeOffsetCommitReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	if !s.checkSasl(ctx) {
@@ -63,7 +64,11 @@ func (s *Server) OffsetCommitVersion(ctx *ctx.NetworkContext, frame []byte, vers
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec.NewOffsetCommitResp(req.CorrelationId)
+	resp := codec.OffsetCommitResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: req.CorrelationId,
+		},
+	}
 	resp.TopicRespList = make([]*codec.OffsetCommitTopicResp, len(lowTopicRespList))
 	for i, lowTopicResp := range lowTopicRespList {
 		f := &codec.OffsetCommitTopicResp{}

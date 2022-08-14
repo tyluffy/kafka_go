@@ -18,8 +18,8 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,12 +32,17 @@ func (s *Server) SaslHandshake(frame []byte, version int16) ([]byte, gnet.Action
 }
 
 func (s *Server) ReactSaslVersion(frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec.DecodeSaslHandshakeReq(frame, version)
-	if err != nil {
+	req, r, stack := codec.DecodeSaslHandshakeReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	logrus.Debug("sasl handshake request ", req)
-	saslHandshakeResp := codec.NewSaslHandshakeResp(req.CorrelationId)
+	saslHandshakeResp := codec.SaslHandshakeResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: req.CorrelationId,
+		},
+	}
 	saslHandshakeResp.EnableMechanisms = make([]*codec.EnableMechanism, 1)
 	saslHandshakeResp.EnableMechanisms[0] = &codec.EnableMechanism{SaslMechanism: "PLAIN"}
 	return saslHandshakeResp.Bytes(version), gnet.None

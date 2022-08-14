@@ -18,10 +18,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,12 +34,17 @@ func (s *Server) SaslAuthenticate(frame []byte, version int16, context *ctx.Netw
 }
 
 func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
-	req, err := codec.DecodeSaslHandshakeAuthReq(frame, version)
-	if err != nil {
+	req, r, stack := codec.DecodeSaslHandshakeAuthReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	logrus.Debug("sasl handshake request ", req)
-	saslHandshakeResp := codec.NewSaslHandshakeAuthResp(req.CorrelationId)
+	saslHandshakeResp := codec.SaslAuthenticateResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: req.CorrelationId,
+		},
+	}
 	saslReq := service.SaslReq{Username: req.Username, Password: req.Password, ClientId: req.ClientId}
 	authResult, errorCode := service.SaslAuth(context.Addr, s.kafkaImpl, saslReq)
 	if errorCode != 0 {

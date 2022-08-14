@@ -18,10 +18,10 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,8 +34,9 @@ func (s *Server) LeaveGroup(ctx *ctx.NetworkContext, frame []byte, version int16
 }
 
 func (s *Server) ReactLeaveGroupVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, err := codec.DecodeLeaveGroupReq(frame, version)
-	if err != nil {
+	req, r, stack := codec.DecodeLeaveGroupReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	if !s.checkSaslGroup(ctx, req.GroupId) {
@@ -52,7 +53,11 @@ func (s *Server) ReactLeaveGroupVersion(ctx *ctx.NetworkContext, frame []byte, v
 		m.GroupInstanceId = member.GroupInstanceId
 		lowReq.Members[i] = m
 	}
-	resp := codec.NewLeaveGroupResp(req.CorrelationId)
+	resp := codec.LeaveGroupResp{
+		BaseResp: codec.BaseResp{
+			CorrelationId: req.CorrelationId,
+		},
+	}
 	lowResp, err := s.kafkaImpl.GroupLeave(ctx.Addr, lowReq)
 	if err != nil {
 		return nil, gnet.Close

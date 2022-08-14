@@ -18,14 +18,14 @@
 package network
 
 import (
-	"github.com/paashzj/kafka_go/pkg/codec"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 )
 
-func (s *Server) Metadata(ctx *ctx.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
+func (s *Server) Metadata(ctx *ctx.NetworkContext, frame []byte, version int16, config *KafkaProtocolConfig) ([]byte, gnet.Action) {
 	if version == 1 || version == 9 {
 		return s.ReactMetadataVersion(ctx, frame, version, config)
 	}
@@ -33,9 +33,10 @@ func (s *Server) Metadata(ctx *ctx.NetworkContext, frame []byte, version int16, 
 	return nil, gnet.Close
 }
 
-func (s *Server) ReactMetadataVersion(ctx *ctx.NetworkContext, frame []byte, version int16, config *codec.KafkaProtocolConfig) ([]byte, gnet.Action) {
-	metadataTopicReq, err := codec.DecodeMetadataTopicReq(frame, version)
-	if err != nil {
+func (s *Server) ReactMetadataVersion(ctx *ctx.NetworkContext, frame []byte, version int16, config *KafkaProtocolConfig) ([]byte, gnet.Action) {
+	metadataTopicReq, r, stack := codec.DecodeMetadataTopicReq(frame, version)
+	if r != nil {
+		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
 	}
 	logrus.Debug("metadata req ", metadataTopicReq)
@@ -48,9 +49,48 @@ func (s *Server) ReactMetadataVersion(ctx *ctx.NetworkContext, frame []byte, ver
 	var metadataResp *codec.MetadataResp
 	partitionNum, err := s.kafkaImpl.PartitionNum(ctx.Addr, topic)
 	if err != nil {
-		metadataResp = codec.NewMetadataResp(metadataTopicReq.CorrelationId, config, topic, 0, int16(service.UNKNOWN_SERVER_ERROR))
+		var partitionNum2 int = 0
+		metadataResp2 := codec.MetadataResp{}
+		metadataResp2.CorrelationId = metadataTopicReq.CorrelationId
+		metadataResp2.BrokerMetadataList = make([]*codec.BrokerMetadata, 1)
+		metadataResp2.BrokerMetadataList[0] = &codec.BrokerMetadata{NodeId: config.NodeId, Host: config.AdvertiseHost, Port: config.AdvertisePort, Rack: nil}
+		metadataResp2.ClusterId = config.ClusterId
+		metadataResp2.ControllerId = config.NodeId
+		metadataResp2.TopicMetadataList = make([]*codec.TopicMetadata, 1)
+		topicMetadata := codec.TopicMetadata{ErrorCode: int16(service.UNKNOWN_SERVER_ERROR), Topic: topic, IsInternal: false, TopicAuthorizedOperation: -2147483648}
+		topicMetadata.PartitionMetadataList = make([]*codec.PartitionMetadata, partitionNum2)
+		for i := 0; i < partitionNum2; i++ {
+			partitionMetadata := &codec.PartitionMetadata{ErrorCode: 0, PartitionId: i, LeaderId: config.NodeId, LeaderEpoch: 0, OfflineReplicas: nil}
+			replicas := make([]*codec.Replica, 1)
+			replicas[0] = &codec.Replica{ReplicaId: config.NodeId}
+			partitionMetadata.Replicas = replicas
+			partitionMetadata.CaughtReplicas = replicas
+			topicMetadata.PartitionMetadataList[i] = partitionMetadata
+		}
+		metadataResp2.TopicMetadataList[0] = &topicMetadata
+		metadataResp2.ClusterAuthorizedOperation = -2147483648
+		metadataResp = &metadataResp2
 	} else {
-		metadataResp = codec.NewMetadataResp(metadataTopicReq.CorrelationId, config, topic, partitionNum, 0)
+		metadataResp2 := codec.MetadataResp{}
+		metadataResp2.CorrelationId = metadataTopicReq.CorrelationId
+		metadataResp2.BrokerMetadataList = make([]*codec.BrokerMetadata, 1)
+		metadataResp2.BrokerMetadataList[0] = &codec.BrokerMetadata{NodeId: config.NodeId, Host: config.AdvertiseHost, Port: config.AdvertisePort, Rack: nil}
+		metadataResp2.ClusterId = config.ClusterId
+		metadataResp2.ControllerId = config.NodeId
+		metadataResp2.TopicMetadataList = make([]*codec.TopicMetadata, 1)
+		topicMetadata := codec.TopicMetadata{ErrorCode: 0, Topic: topic, IsInternal: false, TopicAuthorizedOperation: -2147483648}
+		topicMetadata.PartitionMetadataList = make([]*codec.PartitionMetadata, partitionNum)
+		for i := 0; i < partitionNum; i++ {
+			partitionMetadata := &codec.PartitionMetadata{ErrorCode: 0, PartitionId: i, LeaderId: config.NodeId, LeaderEpoch: 0, OfflineReplicas: nil}
+			replicas := make([]*codec.Replica, 1)
+			replicas[0] = &codec.Replica{ReplicaId: config.NodeId}
+			partitionMetadata.Replicas = replicas
+			partitionMetadata.CaughtReplicas = replicas
+			topicMetadata.PartitionMetadataList[i] = partitionMetadata
+		}
+		metadataResp2.TopicMetadataList[0] = &topicMetadata
+		metadataResp2.ClusterAuthorizedOperation = -2147483648
+		metadataResp = &metadataResp2
 	}
 	return metadataResp.Bytes(version), gnet.None
 }

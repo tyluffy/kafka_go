@@ -21,11 +21,10 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"github.com/paashzj/kafka_go/pkg/codec"
-	"github.com/paashzj/kafka_go/pkg/codec/api"
 	"github.com/paashzj/kafka_go/pkg/network/ctx"
 	"github.com/paashzj/kafka_go/pkg/service"
 	"github.com/panjf2000/gnet"
+	"github.com/protocol-laboratory/kafka-codec-go/codec"
 	"github.com/sirupsen/logrus"
 	"runtime/debug"
 	"sync"
@@ -45,7 +44,7 @@ type Config struct {
 	EventLoopNum int
 }
 
-func Run(config *Config, kfkProtocolConfig *codec.KafkaProtocolConfig, impl service.KfkServer) (*Server, error) {
+func Run(config *Config, kfkProtocolConfig *KafkaProtocolConfig, impl service.KfkServer) (*Server, error) {
 	serverConfig = config
 	server := &Server{
 		EventServer:         nil,
@@ -85,7 +84,7 @@ type Server struct {
 	*gnet.EventServer
 	ConnMap             sync.Map
 	SaslMap             sync.Map
-	kafkaProtocolConfig *codec.KafkaProtocolConfig
+	kafkaProtocolConfig *KafkaProtocolConfig
 	kafkaImpl           service.KfkServer
 }
 
@@ -117,68 +116,68 @@ func (s *Server) React(frame []byte, c gnet.Conn) (bytes []byte, g gnet.Action) 
 	connMutex.Unlock()
 	connCtx = c.Context()
 	networkContext := connCtx.(*ctx.NetworkContext)
-	apiKey := api.Code(binary.BigEndian.Uint16(frame))
+	apiKey := codec.ApiCode(binary.BigEndian.Uint16(frame))
 	apiVersion := int16(binary.BigEndian.Uint16(frame[2:]))
 	switch apiKey {
-	case api.ApiVersions:
+	case codec.ApiVersions:
 		return s.ApiVersions(frame[4:], apiVersion)
-	case api.SaslHandshake:
+	case codec.SaslHandshake:
 		return s.SaslHandshake(frame[4:], apiVersion)
-	case api.SaslAuthenticate:
+	case codec.SaslAuthenticate:
 		return s.SaslAuthenticate(frame[4:], apiVersion, networkContext)
-	case api.Heartbeat:
+	case codec.Heartbeat:
 		return s.Heartbeat(frame[4:], apiVersion, networkContext)
-	case api.JoinGroup:
+	case codec.JoinGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.JoinGroup(networkContext, frame[4:], apiVersion)
-	case api.SyncGroup:
+	case codec.SyncGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.SyncGroup(networkContext, frame[4:], apiVersion)
-	case api.OffsetFetch:
+	case codec.OffsetFetch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetFetch(networkContext, frame[4:], apiVersion)
-	case api.ListOffsets:
+	case codec.ListOffsets:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.ListOffsets(networkContext, frame[4:], apiVersion)
-	case api.Fetch:
+	case codec.Fetch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Fetch(networkContext, frame[4:], apiVersion)
-	case api.OffsetCommit:
+	case codec.OffsetCommit:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetCommit(networkContext, frame[4:], apiVersion)
-	case api.OffsetForLeaderEpoch:
+	case codec.OffsetForLeaderEpoch:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.OffsetForLeaderEpoch(networkContext, frame[4:], apiVersion)
-	case api.LeaveGroup:
+	case codec.LeaveGroup:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.LeaveGroup(networkContext, frame[4:], apiVersion)
-	case api.Produce:
+	case codec.Produce:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Produce(networkContext, frame[4:], apiVersion, s.kafkaProtocolConfig)
-	case api.Metadata:
+	case codec.Metadata:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}
 		return s.Metadata(networkContext, frame[4:], apiVersion, s.kafkaProtocolConfig)
-	case api.FindCoordinator:
+	case codec.FindCoordinator:
 		if !s.Authed(networkContext) {
 			return s.AuthFailed()
 		}

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package codec
+package network
 
 type KafkaProtocolConfig struct {
 	ClusterId     string

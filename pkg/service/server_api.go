@@ -57,7 +57,7 @@ type KfkServer interface {
 
 	SaslAuthConsumerGroup(addr net.Addr, req SaslReq, consumerGroup string) (bool, ErrorCode)
 
-	Disconnect(addr net.Addr)
-
 	HeartBeat(addr net.Addr, req HeartBeatReq) *HeartBeatResp
+
+	Disconnect(addr net.Addr)
 }
