@@ -34,7 +34,7 @@ func (s *Server) ListOffsets(ctx *ctx.NetworkContext, frame []byte, version int1
 }
 
 func (s *Server) ListOffsetsVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, r, stack := codec.DecodeListOffsetReq(frame, version)
+	req, r, stack := codec.DecodeListOffsetsReq(frame, version)
 	if r != nil {
 		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
@@ -64,18 +64,18 @@ func (s *Server) ListOffsetsVersion(ctx *ctx.NetworkContext, frame []byte, versi
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec.ListOffsetResp{
+	resp := codec.ListOffsetsResp{
 		BaseResp: codec.BaseResp{
 			CorrelationId: req.CorrelationId,
 		},
 	}
-	resp.TopicRespList = make([]*codec.ListOffsetTopicResp, len(lowOffsetRespList))
+	resp.TopicRespList = make([]*codec.ListOffsetsTopicResp, len(lowOffsetRespList))
 	for i, lowTopicResp := range lowOffsetRespList {
-		f := &codec.ListOffsetTopicResp{}
+		f := &codec.ListOffsetsTopicResp{}
 		f.Topic = lowTopicResp.Topic
-		f.PartitionRespList = make([]*codec.ListOffsetPartitionResp, len(lowTopicResp.PartitionRespList))
+		f.PartitionRespList = make([]*codec.ListOffsetsPartitionResp, len(lowTopicResp.PartitionRespList))
 		for j, p := range lowTopicResp.PartitionRespList {
-			partitionResp := &codec.ListOffsetPartitionResp{}
+			partitionResp := &codec.ListOffsetsPartitionResp{}
 			partitionResp.PartitionId = p.PartitionId
 			partitionResp.ErrorCode = int16(p.ErrorCode)
 			partitionResp.Timestamp = p.Time

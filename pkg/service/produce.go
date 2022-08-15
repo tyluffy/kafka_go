@@ -46,11 +46,17 @@ type ProduceTopicResp struct {
 }
 
 type ProducePartitionResp struct {
-	PartitionId    int
-	ErrorCode      int16
-	Offset         int64
-	Time           int64
-	LogStartOffset int64
+	PartitionId     int
+	ErrorCode       int16
+	Offset          int64
+	Time            int64
+	RecordErrorList []*RecordError
+	LogStartOffset  int64
+}
+
+type RecordError struct {
+	BatchIndex             int32
+	BatchIndexErrorMessage *string
 }
 
 func Produce(addr net.Addr, impl KfkServer, req *ProduceReq) (*ProduceResp, error) {

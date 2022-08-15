@@ -82,6 +82,18 @@ func (s *Server) ReactProduceVersion(ctx *ctx.NetworkContext, frame []byte, vers
 			partitionResp.Offset = p.Offset
 			partitionResp.Time = p.Time
 			partitionResp.LogStartOffset = p.LogStartOffset
+			recordErrList := make([]*codec.RecordError, len(p.RecordErrorList))
+			errList := p.RecordErrorList
+			if len(errList) != 0 {
+				for index, record := range errList {
+					recordError := codec.RecordError{
+						BatchIndex:             record.BatchIndex,
+						BatchIndexErrorMessage: record.BatchIndexErrorMessage,
+					}
+					recordErrList[index] = &recordError
+				}
+				partitionResp.RecordErrorList = recordErrList
+			}
 			f.PartitionRespList[j] = partitionResp
 		}
 		resp.TopicRespList[i] = f

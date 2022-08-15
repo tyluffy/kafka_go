@@ -40,7 +40,7 @@ func (s *Server) ReactHeartbeatVersion(frame []byte, version int16, context *ctx
 		return nil, gnet.Close
 	}
 	logrus.Debug("heart beat req ", heartbeatReqV4)
-	heartBeatResp := codec.HeartBeatResp{
+	heartBeatResp := codec.HeartbeatResp{
 		BaseResp: codec.BaseResp{
 			CorrelationId: heartbeatReqV4.CorrelationId,
 		},

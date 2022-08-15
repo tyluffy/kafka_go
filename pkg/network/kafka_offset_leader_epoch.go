@@ -34,7 +34,7 @@ func (s *Server) OffsetForLeaderEpoch(ctx *ctx.NetworkContext, frame []byte, ver
 }
 
 func (s *Server) OffsetForLeaderEpochVersion(ctx *ctx.NetworkContext, frame []byte, version int16) ([]byte, gnet.Action) {
-	req, r, stack := codec.DecodeOffsetLeaderEpochReq(frame, version)
+	req, r, stack := codec.DecodeOffsetForLeaderEpochReq(frame, version)
 	if r != nil {
 		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
@@ -63,18 +63,18 @@ func (s *Server) OffsetForLeaderEpochVersion(ctx *ctx.NetworkContext, frame []by
 	if err != nil {
 		return nil, gnet.Close
 	}
-	resp := codec.OffsetLeaderEpochResp{
+	resp := codec.OffsetForLeaderEpochResp{
 		BaseResp: codec.BaseResp{
 			CorrelationId: req.CorrelationId,
 		},
 	}
-	resp.TopicRespList = make([]*codec.OffsetLeaderEpochTopicResp, len(lowTopicRespList))
+	resp.TopicRespList = make([]*codec.OffsetForLeaderEpochTopicResp, len(lowTopicRespList))
 	for i, lowTopicResp := range lowTopicRespList {
-		f := &codec.OffsetLeaderEpochTopicResp{}
+		f := &codec.OffsetForLeaderEpochTopicResp{}
 		f.Topic = lowTopicResp.Topic
-		f.PartitionRespList = make([]*codec.OffsetLeaderEpochPartitionResp, len(lowTopicResp.PartitionRespList))
+		f.PartitionRespList = make([]*codec.OffsetForLeaderEpochPartitionResp, len(lowTopicResp.PartitionRespList))
 		for j, p := range lowTopicResp.PartitionRespList {
-			partitionResp := &codec.OffsetLeaderEpochPartitionResp{}
+			partitionResp := &codec.OffsetForLeaderEpochPartitionResp{}
 			partitionResp.ErrorCode = p.ErrorCode
 			partitionResp.PartitionId = p.PartitionId
 			partitionResp.LeaderEpoch = p.LeaderEpoch

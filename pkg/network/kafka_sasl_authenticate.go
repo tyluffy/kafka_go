@@ -34,7 +34,7 @@ func (s *Server) SaslAuthenticate(frame []byte, version int16, context *ctx.Netw
 }
 
 func (s *Server) ReactSaslHandshakeAuthVersion(frame []byte, version int16, context *ctx.NetworkContext) ([]byte, gnet.Action) {
-	req, r, stack := codec.DecodeSaslHandshakeAuthReq(frame, version)
+	req, r, stack := codec.DecodeSaslAuthenticateReq(frame, version)
 	if r != nil {
 		logrus.Warn("decode sync group error", r, string(stack))
 		return nil, gnet.Close
